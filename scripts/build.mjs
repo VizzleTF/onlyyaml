@@ -158,7 +158,7 @@ function jsonLdBreadcrumb(post, canonicalUrl) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Главная", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "Блог", item: `${SITE_URL}/blog.html` },
+      { "@type": "ListItem", position: 2, name: "Блог", item: `${SITE_URL}/blog/` },
       { "@type": "ListItem", position: 3, name: post.title, item: canonicalUrl },
     ],
   });
@@ -330,7 +330,8 @@ async function buildBlogIndex(posts, templates, partials) {
     postCardsHtml: rest.map(p => cardHtml(p)).join("\n"),
   };
   const html = render(templates.blog, vars);
-  await writeFile(join(DIST, "blog.html"), html);
+  await mkdir(join(DIST, "blog"), { recursive: true });
+  await writeFile(join(DIST, "blog", "index.html"), html);
 }
 
 async function buildAbout(templates, partials) {
@@ -384,7 +385,7 @@ ${items}
 async function buildSitemap(posts) {
   const urls = [
     { loc: `${SITE_URL}/`, lastmod: new Date(), priority: "1.0", changefreq: "weekly" },
-    { loc: `${SITE_URL}/blog.html`, lastmod: posts[0]?.date || new Date(), priority: "0.9", changefreq: "weekly" },
+    { loc: `${SITE_URL}/blog/`, lastmod: posts[0]?.date || new Date(), priority: "0.9", changefreq: "weekly" },
     ...posts.map(p => ({
       loc: `${SITE_URL}/blog/${p.slug}/`,
       lastmod: p.updatedDate || p.date,
@@ -408,10 +409,8 @@ ${body}
 }
 
 async function buildRedirects() {
-  // Astro отдавал /blog/ как индекс коллекции. В новой схеме архив — /blog.html.
-  // URL постов /blog/<slug>/ совпадают со старыми — редирект не нужен.
-  const r = `/blog/   /blog.html   301
-/blog    /blog.html   301
+  // Архив — /blog/ (index.html). Старый путь /blog.html уводим на /blog/.
+  const r = `/blog.html   /blog/   301
 `;
   await writeFile(join(DIST, "_redirects"), r);
 }
