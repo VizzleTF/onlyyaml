@@ -16,6 +16,7 @@
 
 <div class="bg-layer bg-image"></div>
 <div class="bg-layer bg-tint bg-tint--dim"></div>
+<canvas class="bg-layer bg-rain" id="bgRain" aria-hidden="true"></canvas>
 <div class="bg-layer bg-scanlines"></div>
 <div class="bg-layer bg-noise"></div>
 <div class="bg-layer bg-vignette"></div>
@@ -33,9 +34,9 @@
 <header class="page-header">
   <div>
     <div class="eyebrow">homelab // journal</div>
-    <h1 class="page-title">
-      <span class="line-1">ARCHIVE.</span>
-      <span class="line-2">// LOG ENTRIES</span>
+    <h1 class="page-title glitch">
+      <span class="line-1" data-text="ARCHIVE.">ARCHIVE.</span>
+      <span class="line-2" data-text="// LOG ENTRIES">// LOG ENTRIES</span>
     </h1>
     <p class="page-header-sub">
       {{postCount}} записи о том, как держать homelab на ходу: kubernetes, gitops, storage, сети, наблюдаемость и редкие моменты, когда всё работает.

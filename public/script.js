@@ -102,4 +102,56 @@
       });
     });
   }
+
+  // ─── matrix rain (global, density via CSS .bg-rain opacity) ───
+  const canvas = document.getElementById('bgRain');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (canvas && !reduceMotion) {
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const CHARS = '01{}[]<>/\\|=*+-#$%@kubectlsystemdnixtalosvaulthelmcilium01'.split('');
+    let cols, drops, fontSize, dpr, running = true;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      fontSize = Math.round(16 * dpr);
+      cols = Math.ceil(canvas.width / fontSize);
+      drops = new Array(cols).fill(0).map(() => Math.random() * -50);
+    }
+
+    function frame() {
+      if (!running) return;
+      ctx.fillStyle = 'rgba(10, 6, 19, 0.12)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = fontSize + "px 'JetBrains Mono', monospace";
+      ctx.textBaseline = 'top';
+
+      for (let i = 0; i < cols; i++) {
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+        const ch = CHARS[(Math.random() * CHARS.length) | 0];
+        ctx.fillStyle = 'rgba(180, 245, 255, 0.95)';
+        ctx.fillText(ch, x, y);
+        if (drops[i] > 1) {
+          const ch2 = CHARS[(Math.random() * CHARS.length) | 0];
+          ctx.fillStyle = 'rgba(34, 230, 255, 0.35)';
+          ctx.fillText(ch2, x, y - fontSize);
+        }
+        if (y > canvas.height && Math.random() > 0.975) drops[i] = Math.random() * -20;
+        drops[i] += 0.55 + Math.random() * 0.25;
+      }
+      requestAnimationFrame(frame);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) requestAnimationFrame(frame);
+    });
+    requestAnimationFrame(frame);
+  }
 })();

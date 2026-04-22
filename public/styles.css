@@ -94,6 +94,76 @@ body {
   border-color: var(--accent-2);
   transform: scale(0.55);
 }
+.brand-only {
+  color: var(--ink-0);
+  display: inline-block;
+  animation: lamp-flicker 13.4s infinite steps(1);
+  will-change: opacity, text-shadow, color;
+}
+@keyframes lamp-flicker {
+  /* steady idle glow */
+  0%, 11%    { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* short double-blink */
+  12%        { opacity: 0.22; text-shadow: none; }
+  13%        { opacity: 1;    text-shadow: 0 0 7px rgba(244, 241, 255, 0.7); }
+  14%        { opacity: 0.4;  text-shadow: none; }
+  15%, 22%   { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* dying-tube brownout — goes dim and warm */
+  23%        { opacity: 0.55; color: #ffd9a8; text-shadow: 0 0 2px rgba(255, 200, 140, 0.25); }
+  25%        { opacity: 0.35; color: #ffd9a8; text-shadow: none; }
+  27%        { opacity: 0.7;  color: #ffe3b8; text-shadow: 0 0 3px rgba(255, 210, 150, 0.35); }
+  28%        { opacity: 0.12; text-shadow: none; }
+  29%        { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 10px rgba(244, 241, 255, 0.85); }
+  30%, 37%   { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* tiny single blink */
+  38%        { opacity: 0.6;  text-shadow: none; }
+  39%, 48%   { opacity: 1;    text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* magenta arc-flash — broken contact sparks */
+  49%        { opacity: 0.9;  color: #ffb0d4; text-shadow: 0 0 10px rgba(255, 45, 120, 0.7); }
+  50%        { opacity: 0.25; text-shadow: none; }
+  51%        { opacity: 1;    color: #ffb0d4; text-shadow: 0 0 14px rgba(255, 45, 120, 0.9); }
+  52%        { opacity: 0.3;  color: var(--ink-0); text-shadow: none; }
+  53%, 58%   { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* erratic buzz cluster */
+  59%        { opacity: 0.18; text-shadow: none; }
+  59.6%      { opacity: 0.9;  text-shadow: 0 0 5px rgba(244, 241, 255, 0.4); }
+  60%        { opacity: 0.35; text-shadow: none; }
+  60.4%      { opacity: 1;    text-shadow: 0 0 8px rgba(244, 241, 255, 0.7); }
+  61%        { opacity: 0.2;  text-shadow: none; }
+  61.4%      { opacity: 0.85; text-shadow: 0 0 4px rgba(244, 241, 255, 0.4); }
+  62%        { opacity: 0.4;  text-shadow: none; }
+  62.4%      { opacity: 1;    text-shadow: 0 0 6px rgba(244, 241, 255, 0.55); }
+  63%, 71%   { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* long deep brownout — nearly off */
+  72%        { opacity: 0.08; text-shadow: none; }
+  74%        { opacity: 0.12; text-shadow: none; }
+  76%        { opacity: 0.06; text-shadow: none; }
+  77%        { opacity: 0.9;  text-shadow: 0 0 12px rgba(244, 241, 255, 0.9); }
+  78%, 84%   { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* cyan ballast hiccup */
+  85%        { opacity: 0.75; color: #bff4ff; text-shadow: 0 0 8px rgba(34, 230, 255, 0.5); }
+  86%        { opacity: 0.3;  text-shadow: none; }
+  87%        { opacity: 1;    color: #bff4ff; text-shadow: 0 0 9px rgba(34, 230, 255, 0.65); }
+  88%        { opacity: 0.45; color: var(--ink-0); text-shadow: none; }
+  89%, 94%   { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+
+  /* tail-end stutter */
+  95%        { opacity: 0.25; text-shadow: none; }
+  96%        { opacity: 1;    text-shadow: 0 0 5px rgba(244, 241, 255, 0.45); }
+  97%        { opacity: 0.5;  text-shadow: none; }
+  98%, 100%  { opacity: 1;    color: var(--ink-0); text-shadow: 0 0 4px rgba(244, 241, 255, 0.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-only { animation: none; opacity: 1; text-shadow: none; }
+}
+
 .brand .tag {
   color: var(--accent);
   position: relative;
@@ -1150,4 +1220,142 @@ h1.page-title .line-2 {
   .crumbs, .post-hero { padding-left: 20px; padding-right: 20px; }
   .post-body { padding: 40px 20px 60px; font-size: 15px; }
   .related { padding: 40px 20px 60px; }
+}
+
+/* ─────────── home-only cyberpunk fx ─────────── */
+
+/* matrix rain canvas sits just above the tint, below scanlines */
+.bg-rain {
+  z-index: 0;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+}
+body.home .bg-rain {
+  opacity: 0.1;
+}
+
+/* slow drift of neon tint pools */
+body.home .bg-tint {
+  background-size: 140% 140%;
+  animation: tintDrift 48s ease-in-out infinite alternate;
+}
+@keyframes tintDrift {
+  0%   { background-position: 0% 30%; filter: hue-rotate(0deg); }
+  50%  { background-position: 100% 70%; filter: hue-rotate(10deg); }
+  100% { background-position: 20% 90%; filter: hue-rotate(-6deg); }
+}
+
+/* scanlines gently drift downward (CRT refresh) */
+body.home .bg-scanlines {
+  animation: scanDrift 6s linear infinite;
+}
+@keyframes scanDrift {
+  from { background-position-y: 0; }
+  to   { background-position-y: 3px; }
+}
+
+/* a single bright rolling bar passes top→bottom every ~10s */
+body.home .bg-rolling-bar {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(34, 230, 255, 0.00) 40%,
+    rgba(34, 230, 255, 0.09) 49%,
+    rgba(255, 45, 120, 0.08) 51%,
+    rgba(34, 230, 255, 0.00) 60%,
+    transparent 100%
+  );
+  background-size: 100% 300%;
+  background-repeat: no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+  animation: rollingBar 11s linear infinite;
+}
+@keyframes rollingBar {
+  0%   { background-position: 0 -110%; }
+  100% { background-position: 0 210%; }
+}
+
+/* horizontal glitch tear — fires in short bursts */
+body.home .bg-tear {
+  z-index: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent var(--tear-top, 20%),
+      rgba(255, 45, 120, 0.22) var(--tear-top, 20%),
+      rgba(34, 230, 255, 0.22) calc(var(--tear-top, 20%) + 2%),
+      transparent calc(var(--tear-top, 20%) + 2%)
+    );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: glitchTear 22s steps(1, end) infinite;
+  will-change: transform, opacity;
+}
+@keyframes glitchTear {
+  0%, 94%          { opacity: 0; transform: translate3d(0,0,0); }
+  94.2%            { opacity: 0.9; transform: translate3d(6px,0,0); }
+  94.5%            { opacity: 0.9; transform: translate3d(-4px,0,0); }
+  94.8%            { opacity: 0.7; transform: translate3d(2px,0,0); }
+  95%, 100%        { opacity: 0; transform: translate3d(0,0,0); }
+}
+
+/* RGB split / glitch on hero & page titles */
+.glitch .line-1,
+.glitch .line-2 {
+  position: relative;
+  display: block;
+}
+.glitch .line-1::before,
+.glitch .line-2::before,
+.glitch .line-1::after,
+.glitch .line-2::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  text-shadow: none;
+}
+.glitch .line-1::before,
+.glitch .line-2::before {
+  color: #ff2d78;
+  animation: rgbShiftA 3.6s steps(12, end) infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+.glitch .line-1::after,
+.glitch .line-2::after {
+  color: #22e6ff;
+  animation: rgbShiftB 3.6s steps(12, end) infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+}
+@keyframes rgbShiftA {
+  0%, 88%   { transform: translate(-1px, 0); opacity: 0.55; }
+  90%       { transform: translate(-6px, -1px); opacity: 0.9; }
+  92%       { transform: translate(3px, 1px); opacity: 0.9; }
+  94%       { transform: translate(-1px, 0); opacity: 0.55; }
+  100%      { transform: translate(-1px, 0); opacity: 0.55; }
+}
+@keyframes rgbShiftB {
+  0%, 88%   { transform: translate(1px, 0); opacity: 0.55; }
+  90%       { transform: translate(6px, 1px); opacity: 0.9; }
+  92%       { transform: translate(-3px, -1px); opacity: 0.9; }
+  94%       { transform: translate(1px, 0); opacity: 0.55; }
+  100%      { transform: translate(1px, 0); opacity: 0.55; }
+}
+
+/* respect motion preferences — freeze everything */
+@media (prefers-reduced-motion: reduce) {
+  body.home .bg-tint,
+  body.home .bg-scanlines,
+  body.home .bg-rolling-bar,
+  body.home .bg-tear,
+  .glitch .line-1::before,
+  .glitch .line-2::before,
+  .glitch .line-1::after,
+  .glitch .line-2::after { animation: none; }
+  body.home .bg-rolling-bar,
+  body.home .bg-tear { display: none; }
+  .bg-rain { display: none; }
 }
