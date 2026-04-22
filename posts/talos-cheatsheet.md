@@ -72,7 +72,7 @@ talosctl dashboard --nodes 192.168.1.101
 
 Это TUI с живыми метриками ноды: CPU, память, сеть, статусы сервисов, последние логи. Удобнее, чем бегать по отдельным `logs` и `top`.
 
-> 💡 **Подробнее про ресурсы Talos** - `talosctl get --help`. Talos хранит состояние как CRD-подобные ресурсы: `members`, `nodeaddresses`, `services`, `hostname`, `routes` и так далее.
+> **Подробнее про ресурсы Talos** - `talosctl get --help`. Talos хранит состояние как CRD-подобные ресурсы: `members`, `nodeaddresses`, `services`, `hostname`, `routes` и так далее.
 
 
 ## Чтение и редактирование machine config
@@ -107,7 +107,7 @@ talosctl upgrade \
 1. Обновляем одну ноду, дожидаемся `Ready` и зелёного статуса в Longhorn UI.
 2. Только потом следующую.
 
-> 💡 **Внимательно!** В кластере из 3 CP две одновременных перезагрузки убивают кворум etcd. Если в `controlplane.yaml` включён `allowSchedulingOnControlPlanes: true` и Longhorn с `defaultReplicaCount=2` - одновременный апгрейд двух нод оставит тома без живых реплик. Трогаем по одной.
+> **Внимательно!** В кластере из 3 CP две одновременных перезагрузки убивают кворум etcd. Если в `controlplane.yaml` включён `allowSchedulingOnControlPlanes: true` и Longhorn с `defaultReplicaCount=2` - одновременный апгрейд двух нод оставит тома без живых реплик. Трогаем по одной.
 
 ## Смена образа
 
@@ -163,7 +163,7 @@ talosctl reset --nodes 192.168.1.101 --graceful --reboot
 - `--reboot` - после wipe перезагрузиться в maintenance mode (вместо shutdown).
 - `--system-labels-to-wipe STATE,EPHEMERAL` - точечный wipe. Без флагов стирается всё.
 
-> 💡 **Внимательно!** Reset убивает все Longhorn-реплики на ноде. Перед reset - заходим в Longhorn UI и убеждаемся, что все тома здоровы и реплицированы на оставшиеся ноды. Иначе получим `degraded` тома и долгий ребилд после того, как нода вернётся.
+> **Внимательно!** Reset убивает все Longhorn-реплики на ноде. Перед reset - заходим в Longhorn UI и убеждаемся, что все тома здоровы и реплицированы на оставшиеся ноды. Иначе получим `degraded` тома и долгий ребилд после того, как нода вернётся.
 
 ## Работа с etcd
 
@@ -178,7 +178,7 @@ talosctl etcd snapshot backup.db            # бэкап etcd в файл
 
 `forfeit-leadership` удобно делать перед ребутом текущего лидера - чтобы не дожидаться переизбрания после того, как нода ушла в перезагрузку.
 
-> 💡 **Подробнее про снапшоты.** `etcd snapshot` - по сути единственный способ сделать бэкап control-plane state в Talos. Никакого `etcdctl` на ноде нет, Talos immutable. Файл кладём куда-нибудь вне кластера, желательно в object storage.
+> **Подробнее про снапшоты.** `etcd snapshot` - по сути единственный способ сделать бэкап control-plane state в Talos. Никакого `etcdctl` на ноде нет, Talos immutable. Файл кладём куда-нибудь вне кластера, желательно в object storage.
 
 ## Bootstrap - ровно один раз
 
