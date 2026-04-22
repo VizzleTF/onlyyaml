@@ -71,7 +71,7 @@ Longhorn хранит данные как iSCSI-таргеты и управля
 
 Провайдер [siderolabs/talos](https://registry.terraform.io/providers/siderolabs/talos/latest) всё это решает. Он умеет генерить секреты кластера, собирать machine config, накатывать его через Talos API и делать bootstrap первой ноды. Всё внутри одного `terraform apply`.
 
-> 💡 **Ограничение провайдера:** обновление самой ОС Talos (не Kubernetes) провайдер не делает. Для этого остаётся `talosctl upgrade` на каждую ноду.
+> **Ограничение провайдера:** обновление самой ОС Talos (не Kubernetes) провайдер не делает. Для этого остаётся `talosctl upgrade` на каждую ноду.
 
 ## Настройка провайдера
 
@@ -249,7 +249,7 @@ talosctl upgrade \
 
 Команда делает контролируемый ребут через A/B-партиции Talos: новый образ пишется в соседний слот, нода перезагружается в него, и если не поднялась - автоматический откат на предыдущий. Данные Longhorn на `/var/lib/longhorn` при этом не трогаются, EPHEMERAL-партиция сохраняется между апгрейдами.
 
-> 💡 **Обновляйте ноды по одной.** При ребуте одной CP Longhorn теряет replica на ней, но том продолжает отдаваться с двух оставшихся (`defaultReplicaCount=2` + 3 ноды). Когда нода вернулась - replica ребилдится и становится `Healthy`. Следующую трогать только после того, как Longhorn UI покажет все тома зелёными - иначе два одновременных ребута могут оставить том без живых реплик.
+> **Обновляйте ноды по одной.** При ребуте одной CP Longhorn теряет replica на ней, но том продолжает отдаваться с двух оставшихся (`defaultReplicaCount=2` + 3 ноды). Когда нода вернулась - replica ребилдится и становится `Healthy`. Следующую трогать только после того, как Longhorn UI покажет все тома зелёными - иначе два одновременных ребута могут оставить том без живых реплик.
 
 ## Поднимаем ВМ
 
@@ -326,7 +326,7 @@ resource "local_sensitive_file" "talosconfig" {
 
 `talos_machine_secrets` генерит CA, bootstrap token и сертификаты, а потом хранит их в Terraform state.
 
-> 💡 **Внимательно!** Если используете удалённый backend (S3, Terraform Cloud) - убедитесь, что он с шифрованием. Локальный `terraform.tfstate` с секретами кластера в git - плохая идея.
+> **Внимательно!** Если используете удалённый backend (S3, Terraform Cloud) - убедитесь, что он с шифрованием. Локальный `terraform.tfstate` с секретами кластера в git - плохая идея.
 
 ## Machine config для Longhorn
 
@@ -358,9 +358,9 @@ machine:
 
 `kernel.modules` с `nvme_tcp` нужен только если планируете трогать Longhorn V2 Data Engine. Для классического V1 на iSCSI можно не включать.
 
-> 💡 **Подробнее про `extraMounts`** в документации Talos: [Kubelet Configuration](https://www.talos.dev/latest/reference/configuration/v1alpha1/config/#Config.machine.kubelet.extraMounts).
+> **Подробнее про `extraMounts`** в документации Talos: [Kubelet Configuration](https://www.talos.dev/latest/reference/configuration/v1alpha1/config/#Config.machine.kubelet.extraMounts).
 
-> 💡 **Официальный гайд Longhorn по Talos** со всеми data-path mount-ами и объяснением, зачем они нужны: [Talos Linux Support](https://longhorn.io/docs/archives/1.7.3/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts).
+> **Официальный гайд Longhorn по Talos** со всеми data-path mount-ами и объяснением, зачем они нужны: [Talos Linux Support](https://longhorn.io/docs/archives/1.7.3/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts).
 
 ## Патч для control-plane с VIP
 
@@ -382,7 +382,7 @@ cluster:
 
 Патч прикладываем только к CP - воркерам VIP не нужен и не должен объявляться (а `cluster.*` настройки и так читаются только из controlplane machine config).
 
-> 💡 **IP-адрес** в yaml-е захардкожен под пример статьи. Подставьте свой VIP из той же подсети, что и ноды, и этот же адрес укажите в `cluster_endpoint`.
+> **IP-адрес** в yaml-е захардкожен под пример статьи. Подставьте свой VIP из той же подсети, что и ноды, и этот же адрес укажите в `cluster_endpoint`.
 
 ## Собираем конфиги нод
 
