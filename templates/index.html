@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+{{headCommon}}
+<title>kubelab // homelab devops blog</title>
+<meta name="description" content="Про то, как заменить весь SaaS на селфхост и каждый вечер НЕ чинить то, что работало вчера.">
+<link rel="canonical" href="https://onlyyaml.dev/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="kubelab // homelab devops blog">
+<meta property="og:description" content="Про то, как заменить весь SaaS на селфхост.">
+<meta property="og:url" content="https://onlyyaml.dev/">
+<meta property="og:image" content="https://onlyyaml.dev/open-graph.png">
+<meta property="og:locale" content="ru_RU">
+<script type="application/ld+json">{
+"@context":"https://schema.org",
+"@type":"WebSite",
+"name":"onlyyaml",
+"url":"https://onlyyaml.dev/",
+"inLanguage":"ru-RU",
+"author":{"@type":"Person","name":"Ivan K"}
+}</script>
+</head>
+<body>
+
+<div class="bg-layer bg-image"></div>
+<div class="bg-layer bg-tint"></div>
+<div class="bg-layer bg-scanlines"></div>
+<div class="bg-layer bg-noise"></div>
+<div class="bg-layer bg-vignette"></div>
+
+{{nav}}
+
+<section class="hero">
+  <div class="chrome tl">
+    <div>node · talos-03 / proxmox-ve</div>
+  </div>
+  <div class="chrome bl">
+    <span>talos <b>1.11</b></span>
+    <span>cilium <b>1.19</b></span>
+    <span>longhorn <b>1.11</b></span>
+  </div>
+  <div class="chrome br">
+    <span>argocd <b>9.5.3</b></span>
+    <span>vault <b>0.32</b></span>
+    <span>authentik <b>2026.2</b></span>
+    <span>vmstack <b>0.74</b></span>
+  </div>
+
+  <div class="hero-left">
+    <div class="eyebrow">talos · cilium · argocd · vault · 2k26</div>
+    <h1 class="hero-title">
+      <span class="line-1">BARE METAL.</span>
+      <span class="line-2">BARE TRUTH.</span>
+    </h1>
+    <p class="hero-sub">
+      Про то, как заменить весь SaaS на селфхост и каждый вечер НЕ чинить то, что работало вчера.
+    </p>
+    <div class="hero-cta-row">
+      <a href="/blog.html" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        читать блог
+      </a>
+      <a href="https://t.me/kubelab" target="_blank" rel="noopener" class="btn-secondary">
+        <span class="icon-circle">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.5 4.2 18.3 19.8c-.24 1.08-.88 1.34-1.78.84l-4.92-3.62-2.37 2.28c-.26.26-.48.48-.98.48l.35-4.98 9.08-8.2c.4-.35-.09-.54-.61-.2L5.85 13.5 1 11.97c-1.05-.33-1.08-1.06.22-1.56l18.94-7.3c.88-.33 1.64.2 1.34 1.09Z"/></svg>
+        </span>
+        Обсудить в TG
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="scroll-hint">
+      <span>scroll</span>
+      <div class="bar"></div>
+    </div>
+  </div>
+</section>
+
+<section class="featured" id="posts">
+  <div class="featured-head">
+    <h2>Свежие записи</h2>
+    <div class="kbd">// log --limit 3 --branch main</div>
+  </div>
+  <div class="post-grid">
+{{latestThreeHtml}}
+  </div>
+</section>
+
+{{footer}}
+
+<script src="/script.js"></script>
+</body>
+</html>
