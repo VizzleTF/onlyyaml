@@ -1,0 +1,23 @@
+{
+  "name": "onlyyaml-blog",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "homelab devops blog // static site built from markdown",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --watch",
+    "migrate": "node scripts/migrate-from-astro.mjs",
+    "serve": "npx serve dist -l 3000"
+  },
+  "dependencies": {
+    "@shikijs/markdown-it": "^1.24.0",
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "shiki": "^1.24.0"
+  },
+  "devDependencies": {
+    "chokidar": "^4.0.1"
+  }
+}

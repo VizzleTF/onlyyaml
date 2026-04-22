@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+{{headCommon}}
+<title>Блог // onlyyaml</title>
+<meta name="description" content="Записи о том, как держать homelab на ходу: kubernetes, gitops, storage, сети, наблюдаемость.">
+<link rel="canonical" href="https://onlyyaml.dev/blog.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Блог // onlyyaml">
+<meta property="og:description" content="Записи о homelab: kubernetes, gitops, storage, сети, наблюдаемость.">
+<meta property="og:url" content="https://onlyyaml.dev/blog.html">
+<meta property="og:image" content="https://onlyyaml.dev/open-graph.png">
+<meta property="og:locale" content="ru_RU">
+</head>
+<body>
+
+<div class="bg-layer bg-image"></div>
+<div class="bg-layer bg-tint bg-tint--dim"></div>
+<div class="bg-layer bg-scanlines"></div>
+<div class="bg-layer bg-noise"></div>
+<div class="bg-layer bg-vignette"></div>
+
+{{nav}}
+
+<div class="chrome tl"><div>archive · talos / cilium / cnpg</div></div>
+<div class="chrome br">
+  <span>argocd <b>9.5.3</b></span>
+  <span>vault <b>0.32</b></span>
+  <span>longhorn <b>1.11</b></span>
+  <span>rev <b>#2k26</b></span>
+</div>
+
+<header class="page-header">
+  <div>
+    <div class="eyebrow">homelab // journal</div>
+    <h1 class="page-title">
+      <span class="line-1">ARCHIVE.</span>
+      <span class="line-2">// LOG ENTRIES</span>
+    </h1>
+    <p class="page-header-sub">
+      {{postCount}} записи о том, как держать homelab на ходу: kubernetes, gitops, storage, сети, наблюдаемость и редкие моменты, когда всё работает.
+    </p>
+  </div>
+  <pre class="page-header-meta">$ kubectl get pods -A
+NAMESPACE      NAME                READY   AGE
+argocd         argocd-server       1/1     <b>142d</b>
+kube-system    cilium-agent-x4n2   1/1     <b>208d</b>
+longhorn       longhorn-manager    1/1     <b>208d</b>
+cnpg-system    cnpg-controller     1/1      <b>91d</b>
+vault          vault-0             1/1     <b>186d</b>
+authentik      authentik-server    2/2      <b>54d</b>
+victoria       vmagent-0           1/1      <b>67d</b>
+...            ...                 ...     ...</pre>
+</header>
+
+<div class="tag-filter">
+  <span class="kbd">// filter --tag</span>
+{{tagsChipsHtml}}
+</div>
+
+<main class="blog-main">
+{{featuredCardHtml}}
+
+  <div class="post-grid post-grid--all" id="postGrid">
+{{postCardsHtml}}
+  </div>
+</main>
+
+{{footer}}
+
+<script src="/script.js"></script>
+</body>
+</html>
