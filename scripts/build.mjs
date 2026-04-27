@@ -409,8 +409,11 @@ ${body}
 }
 
 async function buildRedirects() {
-  // Архив — /blog/ (index.html). Старый путь /blog.html уводим на /blog/.
-  const r = `/blog.html   /blog/   301
+  // Никаких 30x: rewrite-правила (200) подавляют trailing-slash нормализацию Cloudflare Pages.
+  // /blog, /blog.html и /blog/<slug> отдают тот же index.html, что и канонические /blog/, /blog/<slug>/.
+  const r = `/blog          /blog/index.html         200
+/blog.html     /blog/index.html         200
+/blog/:slug    /blog/:slug/index.html   200
 `;
   await writeFile(join(DIST, "_redirects"), r);
 }
