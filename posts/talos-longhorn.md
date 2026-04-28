@@ -1,5 +1,5 @@
 ---
-title: 'Longhorn на Talos: кастомный образ через Terraform'
+title: 'Prod-ready Kubernetes на Talos: Terraform, кастомный образ и Longhorn'
 summary: >-
   Собираем кастомный образ Talos с iscsi-tools через Image Factory, накатываем
   его на ноды через провайдер siderolabs/talos и разворачиваем Longhorn.
@@ -15,7 +15,7 @@ rss: >-
   Talos + Longhorn - продолжение серии. Разбираемся, почему обычный образ Talos
   не подходит для Longhorn, собираем свой через Talos Image Factory, накатываем
   через провайдер siderolabs/talos и ставим Longhorn из Helm.
-seoTitle: 'Longhorn + Talos: кастомный образ через Terraform talos provider'
+seoTitle: 'Prod-ready Kubernetes на Talos: Terraform, custom image, Longhorn storage'
 seoDescription: >-
   Пошаговое руководство: как собрать кастомный образ Talos с iscsi-tools и
   util-linux-tools через Talos Image Factory, накатить его на ноды через
