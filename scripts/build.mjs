@@ -30,6 +30,37 @@ const DEFAULT_OG = `${SITE_URL}/open-graph.png`;
 const CATEGORIES = ["kubernetes", "gitops", "storage", "networking", "observability", "security", "misc"];
 const MONTHS_RU = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
 
+// Tags shown as the visible category label in cards/list — first match wins.
+const PRIMARY_TECH_TAGS = ["terraform", "talos", "kubernetes", "longhorn", "argocd", "cilium", "vault", "cnpg", "proxmox"];
+
+// Map any label (tech tag or category) → unique color slot.
+// Каждый тег получает свой цвет, чтобы соседние чипы/пиллы не сливались.
+const CAT_SLUG = {
+  terraform: "tf",
+  proxmox: "px",
+  kubernetes: "k8s",
+  talos: "tl",
+  longhorn: "lh",
+  cilium: "cl",
+  gitops: "go",
+  argocd: "ag",
+  cnpg: "cn",
+  observability: "ob",
+  prometheus: "ob",
+  vault: "vt",
+  security: "sc",
+  networking: "nt",
+  storage: "st",
+  iac: "tf",
+  misc: "ms",
+};
+function catSlug(label) { return CAT_SLUG[String(label).toLowerCase()] || "tf"; }
+function displayCategory(post) {
+  const lower = post.tags.map(t => String(t).toLowerCase());
+  for (const tech of PRIMARY_TECH_TAGS) if (lower.includes(tech)) return tech;
+  return post.category;
+}
+
 // ---------- helpers ----------
 async function exists(p) { try { await stat(p); return true; } catch { return false; } }
 const escapeHtml = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
@@ -90,11 +121,12 @@ async function loadPosts() {
   await mkdir(POSTS_DIR, { recursive: true });
   const files = (await readdir(POSTS_DIR)).filter(f => f.endsWith(".md"));
   const posts = [];
+  let draftCount = 0;
   for (const f of files) {
     const slug = basename(f, ".md");
     const raw = await readFile(join(POSTS_DIR, f), "utf8");
     const { data, content } = matter(raw);
-    if (data.draft === true) continue;
+    if (data.draft === true) { draftCount++; continue; }
     const date = new Date(data.date);
     const updatedDate = data.updatedDate ? new Date(data.updatedDate) : null;
     const tags = Array.isArray(data.tags) ? data.tags.map(String) : [];
@@ -117,7 +149,7 @@ async function loadPosts() {
     });
   }
   posts.sort((a, b) => b.date - a.date);
-  return posts;
+  return { posts, draftCount };
 }
 
 // ---------- per-post render ----------
@@ -174,55 +206,91 @@ function relatedFor(post, allPosts, limit = 3) {
 }
 
 function tagsAttr(post) {
-  const set = new Set([post.category, ...post.tags.map(t => String(t).toLowerCase())]);
+  const set = new Set([post.category, displayCategory(post), ...post.tags.map(t => String(t).toLowerCase())]);
   return Array.from(set).join(",");
+}
+
+function formatCardDate(date) {
+  return `${date.getDate().toString().padStart(2,"0")} ${MONTHS_RU[date.getMonth()].toUpperCase()}`;
+}
+function formatListDate(date) {
+  return `${date.getFullYear()} · ${(date.getMonth()+1).toString().padStart(2,"0")} · ${date.getDate().toString().padStart(2,"0")}`;
+}
+
+function cardLabels(post) {
+  const lower = post.tags.map(t => String(t).toLowerCase());
+  const matched = PRIMARY_TECH_TAGS.filter(tech => lower.includes(tech));
+  return matched.length ? matched : [post.category];
 }
 
 function cardHtml(post) {
   const href = `/blog/${post.slug}/`;
-  return `    <a href="${href}" class="post-card" data-tags="${escapeAttr(tagsAttr(post))}">
-      <div class="post-tag">// ${escapeHtml(post.category)}</div>
-      <h3 class="post-title">${escapeHtml(post.title)}</h3>
-      <p class="post-excerpt">${escapeHtml(post.summary)}</p>
-      <div class="post-meta"><span>${formatDateShort(post.date)}</span><span class="arrow">→</span></div>
+  const labels = cardLabels(post);
+  const primarySlug = catSlug(labels[0]);
+  const tagsHtml = labels.map(l =>
+    `<span class="card-tag" style="--cat: var(--cat-${catSlug(l)});">${escapeHtml(l)}</span>`
+  ).join("");
+  return `    <a href="${href}" class="card" data-tags="${escapeAttr(tagsAttr(post))}" style="--cat: var(--cat-${primarySlug});">
+      <div class="card-tags">${tagsHtml}</div>
+      <h3>${escapeHtml(post.title)}</h3>
+      <p>${escapeHtml(post.summary)}</p>
+      <div class="card-meta">
+        <span>${formatCardDate(post.date)} · ${post.readingMinutes} MIN</span>
+        <span class="arrow">→</span>
+      </div>
     </a>`;
 }
 
-function featuredHtml(post) {
+function featuredRowHtml(post, index = 1) {
   if (!post) return "";
   const href = `/blog/${post.slug}/`;
-  const stamp = post.category.slice(0, 3);
-  const month = (post.date.getMonth() + 1).toString().padStart(2, "0");
-  return `  <a href="${href}" class="post-featured" data-tags="${escapeAttr(tagsAttr(post))}">
-    <div class="post-featured-body">
-      <div>
-        <div class="post-tag">// ${escapeHtml(post.category)} · featured</div>
+  const label = displayCategory(post);
+  const slug = catSlug(label);
+  const stamp = String(index).padStart(2, "0");
+  const dateUpper = `${post.date.getDate().toString().padStart(2,"0")} ${MONTHS_RU[post.date.getMonth()].toUpperCase()} ${post.date.getFullYear()}`;
+  return `    <a href="${href}" class="featured-row" data-tags="${escapeAttr(tagsAttr(post))}" style="--cat: var(--cat-${slug});">
+      <div class="featured-body">
+        <span class="badge">FEATURED · ${escapeHtml(label.toUpperCase())}</span>
         <h3>${escapeHtml(post.title)}</h3>
+        <p>${escapeHtml(post.summary)}</p>
+        <div class="meta">
+          <span>${dateUpper}</span>
+          <span>·</span>
+          <span><b>${post.readingMinutes}</b> MIN READ</span>
+          <span>·</span>
+          <span><b>${post.wordCount.toLocaleString("ru-RU").replace(/,/g, " ")}</b> WORDS</span>
+        </div>
       </div>
-      <p class="post-excerpt">${escapeHtml(post.summary)}</p>
-      <div class="post-meta">
-        <span><span class="badge">// new</span>${formatDateShort(post.date)} · ~${post.readingMinutes} min</span>
-        <span class="arrow">→</span>
+      <div class="featured-art" aria-hidden="true">
+        <div class="stamp">${stamp}</div>
+        <div class="lbl">${escapeHtml(label)}<br>${escapeHtml(post.slug)}<br>// 2k${(post.date.getFullYear()%100).toString().padStart(2,"0")}</div>
       </div>
-    </div>
-    <div class="post-featured-art">
-      <div class="art-stamp">${escapeHtml(stamp)}<br>/${month}</div>
-      <div class="art-label">#${post.date.getFullYear()}.${month}.${post.date.getDate().toString().padStart(2,"0")}<br>${escapeHtml(post.slug)}</div>
-    </div>
-  </a>`;
+    </a>`;
+}
+
+function listRowHtml(post) {
+  const href = `/blog/${post.slug}/`;
+  const labels = cardLabels(post);
+  const primarySlug = catSlug(labels[0]);
+  const catsHtml = labels.map(l =>
+    `<span class="cat-pill" style="--cat: var(--cat-${catSlug(l)});">${escapeHtml(l)}</span>`
+  ).join("");
+  const sub = post.summary && post.summary.length > 110 ? post.summary.slice(0, 107).trimEnd() + "…" : (post.summary || "");
+  return `      <a href="${href}" class="list-row" data-tags="${escapeAttr(tagsAttr(post))}" style="--cat: var(--cat-${primarySlug});">
+        <span class="date">${formatListDate(post.date)}</span>
+        <span class="cat">${catsHtml}</span>
+        <span class="ttl">${escapeHtml(post.title)}${sub ? `<small>${escapeHtml(sub)}</small>` : ""}</span>
+        <span class="len">~${post.readingMinutes} MIN</span>
+        <span class="arr">→</span>
+      </a>`;
 }
 
 function relatedSectionHtml(related) {
   if (!related.length) return "";
-  const cards = related.map(p => `    <a href="/blog/${p.slug}/" class="post-card">
-      <div class="post-tag">// ${escapeHtml(p.category)}</div>
-      <h3 class="post-title">${escapeHtml(p.title)}</h3>
-      <p class="post-excerpt">${escapeHtml(p.summary)}</p>
-      <div class="post-meta"><span>${formatDateShort(p.date)}</span><span class="arrow">→</span></div>
-    </a>`).join("\n");
+  const cards = related.map(p => cardHtml(p)).join("\n");
   return `<section class="related">
-  <h2>related</h2>
-  <div class="post-grid">
+  <h2>Связанные <i>записи.</i></h2>
+  <div class="cards">
 ${cards}
   </div>
 </section>`;
@@ -230,8 +298,17 @@ ${cards}
 
 // ---------- build steps ----------
 const TERM_DOTS = '<span class="term-dots"><span></span><span></span><span></span></span>';
-function injectTermDots(html) {
-  return html.replace(/<pre([^>]*)>(?!<span class="term-dots")/g, `<pre$1>${TERM_DOTS}`);
+function injectTermChrome(html) {
+  // Shiki emits <pre class="shiki ..." style="background-color:..;color:.." tabindex="0">
+  //   <code class="language-xxx">…</code></pre>
+  // 1. Strip the outer <pre> inline style so our CSS background/foreground takes effect
+  //    (token spans inside <code> keep their own colors, so syntax highlighting still works).
+  // 2. Inject term-dots + lang label after the opening <pre>.
+  return html.replace(/<pre([^>]*)>([\s\S]*?<code(?:[^>]*?)class="(?:language-([\w-]+)|[^"]*)"(?:[^>]*)>)/g, (_m, preAttrs, codeOpen, lang) => {
+    const cleanedAttrs = preAttrs.replace(/\sstyle="[^"]*"/, "");
+    const langLabel = lang ? `<span class="term-name">${escapeHtml(lang)}</span>` : "";
+    return `<pre${cleanedAttrs}>${TERM_DOTS}${langLabel}${codeOpen}`;
+  });
 }
 
 function stripTags(html) {
@@ -252,20 +329,23 @@ function tocHtml(items) {
   if (items.length < 2) return "";
   const lis = items.map((it, i) => {
     const n = String(i + 1).padStart(2, "0");
-    return `    <li><a href="#${escapeAttr(it.id)}"><span class="toc-num">${n}</span><span class="toc-text">${escapeHtml(it.text)}</span></a></li>`;
+    return `      <li><a href="#${escapeAttr(it.id)}"><span class="n">${n}</span><span>${escapeHtml(it.text)}</span></a></li>`;
   }).join("\n");
-  return `<aside class="post-toc" aria-label="Содержание">
-  <div class="toc-title">Содержание</div>
-  <ol class="toc-list">
+  return `  <aside class="toc" aria-label="оглавление">
+    <div class="head">// оглавление</div>
+    <ol>
 ${lis}
-  </ol>
-</aside>`;
+    </ol>
+  </aside>`;
 }
 
 async function buildPostPages(posts, md, templates, partials) {
   for (const post of posts) {
-    const bodyHtml = injectTermDots(md.render(post.body));
+    const bodyHtml = injectTermChrome(md.render(post.body));
     const canonicalUrl = `${SITE_URL}/blog/${post.slug}/`;
+    const label = displayCategory(post);
+    const slug = catSlug(label);
+    const dateUpper = `${post.date.getDate().toString().padStart(2,"0")} ${MONTHS_RU[post.date.getMonth()].toUpperCase()} ${post.date.getFullYear()}`;
     const vars = {
       headCommon: partials.head,
       nav: partials.nav.replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === "Blog" ? "active" : ""),
@@ -284,12 +364,15 @@ async function buildPostPages(posts, md, templates, partials) {
       jsonLdBlogPosting: jsonLdBlogPosting(post, canonicalUrl),
       jsonLdBreadcrumb: jsonLdBreadcrumb(post, canonicalUrl),
       category: escapeHtml(post.category),
+      categoryLabel: escapeHtml(label),
+      catSlug: slug,
       slug: escapeHtml(post.slug),
-      dateHuman: `<b>${post.date.getDate().toString().padStart(2,"0")}</b> ${MONTHS_RU[post.date.getMonth()]} <b>${post.date.getFullYear()}</b>`,
+      deck: escapeHtml(post.summary || ""),
+      dateHuman: dateUpper,
       readingMinutes: String(post.readingMinutes),
       wordCount: post.wordCount.toLocaleString("ru-RU").replace(/,/g, " "),
       updatedBadge: post.updatedDate
-        ? `<span class="dot">·</span><span>upd: <b>${formatDateShort(post.updatedDate)}</b></span>`
+        ? `<span class="sep">·</span><span class="updated">обновлено ${formatDateShort(post.updatedDate)}</span>`
         : "",
       bodyHtml,
       tocHtml: tocHtml(extractToc(bodyHtml)),
@@ -303,22 +386,34 @@ async function buildPostPages(posts, md, templates, partials) {
 }
 
 async function buildBlogIndex(posts, templates, partials) {
-  const featured = posts.find(p => p.featured) || null;
+  // Авто-featured: если в frontmatter ни один пост не помечен `featured: true`,
+  // показываем самый свежий — пустая шапка архива выглядит криво.
+  const featured = posts.find(p => p.featured) || posts[0] || null;
   const rest = featured ? posts.filter(p => p.slug !== featured.slug) : posts;
 
-  // Чипы: все реальные теги из постов + категории, отсортированные по частоте, затем по алфавиту
-  const counts = new Map();
+  // Chip набор: PRIMARY_TECH_TAGS, у которых есть хоть один пост, плюс "все".
+  // Цвет берётся из CAT_SLUG, count — сколько постов имеют этот лейбл по displayCategory.
+  const labelCounts = new Map();
   for (const p of posts) {
-    const set = new Set([p.category, ...p.tags.map(t => String(t).toLowerCase())]);
-    for (const t of set) counts.set(t, (counts.get(t) || 0) + 1);
+    const lower = p.tags.map(t => String(t).toLowerCase());
+    for (const tech of PRIMARY_TECH_TAGS) if (lower.includes(tech)) {
+      labelCounts.set(tech, (labelCounts.get(tech) || 0) + 1);
+    }
+    // также учитываем категорию, если она не в PRIMARY_TECH_TAGS
+    if (!PRIMARY_TECH_TAGS.includes(p.category)) {
+      labelCounts.set(p.category, (labelCounts.get(p.category) || 0) + 1);
+    }
   }
-  const allTags = Array.from(counts.entries())
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([t]) => t);
-  const chips = [
-    `  <button class="tag-chip active" data-filter="all">all</button>`,
-    ...allTags.map(t => `  <button class="tag-chip" data-filter="${escapeAttr(t)}">${escapeHtml(t)}</button>`),
-  ].join("\n");
+  const usedLabels = Array.from(labelCounts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+  const chipParts = [
+    `  <button class="chip on" data-filter="all">все · <span class="count">${posts.length}</span></button>`,
+    ...usedLabels.map(([label, count]) =>
+      `  <button class="chip" data-filter="${escapeAttr(label)}" style="--cat: var(--cat-${catSlug(label)});">${escapeHtml(label)} · <span class="count">${count}</span></button>`
+    ),
+  ];
+  const chips = chipParts.join("\n");
 
   const vars = {
     headCommon: partials.head,
@@ -326,8 +421,8 @@ async function buildBlogIndex(posts, templates, partials) {
     footer: partials.footer,
     postCount: String(posts.length),
     tagsChipsHtml: chips,
-    featuredCardHtml: featuredHtml(featured),
-    postCardsHtml: rest.map(p => cardHtml(p)).join("\n"),
+    featuredRowHtml: featuredRowHtml(featured, 1),
+    archiveListHtml: rest.map(p => listRowHtml(p)).join("\n"),
   };
   const html = render(templates.blog, vars);
   await mkdir(join(DIST, "blog"), { recursive: true });
@@ -344,12 +439,14 @@ async function buildAbout(templates, partials) {
   await writeFile(join(DIST, "about.html"), html);
 }
 
-async function buildHome(posts, templates, partials) {
+async function buildHome(posts, draftCount, templates, partials) {
   const latest = posts.slice(0, 3);
   const vars = {
     headCommon: partials.head,
     nav: partials.nav.replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === "Home" ? "active" : ""),
     footer: partials.footer,
+    publishedCount: String(posts.length),
+    draftCount: String(draftCount),
     latestThreeHtml: latest.map(p => cardHtml(p)).join("\n"),
   };
   const html = render(templates.index, vars);
@@ -446,12 +543,12 @@ async function build() {
 
   await copyPublic();
 
-  const posts = await loadPosts();
+  const { posts, draftCount } = await loadPosts();
   if (!posts.length) console.warn("! no posts found in posts/");
 
   await buildPostPages(posts, md, templates, partials);
   await buildBlogIndex(posts, templates, partials);
-  await buildHome(posts, templates, partials);
+  await buildHome(posts, draftCount, templates, partials);
   await buildAbout(templates, partials);
   await buildRss(posts);
   await buildSitemap(posts);

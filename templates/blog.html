@@ -2,11 +2,11 @@
 <html lang="ru">
 <head>
 {{headCommon}}
-<title>Блог // onlyyaml</title>
+<title>Журнал // onlyyaml</title>
 <meta name="description" content="Записи о том, как держать homelab на ходу: kubernetes, gitops, storage, сети, наблюдаемость.">
 <link rel="canonical" href="https://onlyyaml.dev/blog/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Блог // onlyyaml">
+<meta property="og:title" content="Журнал // onlyyaml">
 <meta property="og:description" content="Записи о homelab: kubernetes, gitops, storage, сети, наблюдаемость.">
 <meta property="og:url" content="https://onlyyaml.dev/blog/">
 <meta property="og:image" content="https://onlyyaml.dev/open-graph.png">
@@ -14,56 +14,46 @@
 </head>
 <body>
 
-<div class="bg-layer bg-image"></div>
-<div class="bg-layer bg-tint bg-tint--dim"></div>
-<canvas class="bg-layer bg-rain" id="bgRain" aria-hidden="true"></canvas>
-<div class="bg-layer bg-scanlines"></div>
-<div class="bg-layer bg-noise"></div>
-<div class="bg-layer bg-vignette"></div>
+<div class="bg tint"></div>
+<div class="bg scan"></div>
+<div class="bg noise"></div>
+<div class="bg vignette"></div>
 
 {{nav}}
 
-<div class="chrome tl"><div>archive · talos / cilium / cnpg</div></div>
-<div class="chrome br">
-  <span>argocd <b>9.5.3</b></span>
-  <span>vault <b>0.32</b></span>
-  <span>longhorn <b>1.11</b></span>
-  <span>rev <b>#2k26</b></span>
+<div class="corner tl">archive · <b>talos / cilium / cnpg</b></div>
+<div class="corner br">
+  <span>rev · <b>#2k26</b></span>
+  <span>entries · <b>{{postCount}}</b></span>
 </div>
 
-<header class="page-header">
+<header class="page-head">
   <div>
     <div class="eyebrow">homelab // journal</div>
-    <h1 class="page-title glitch">
-      <span class="line-1" data-text="ARCHIVE.">ARCHIVE.</span>
-      <span class="line-2" data-text="// LOG ENTRIES">// LOG ENTRIES</span>
+    <h1>
+      ARCHIVE.
+      <i>// <span style="color:var(--accent-2);">LOG ENTRIES</span></i>
     </h1>
-    <p class="page-header-sub">
-      {{postCount}} записи о том, как держать homelab на ходу: kubernetes, gitops, storage, сети, наблюдаемость и редкие моменты, когда всё работает.
-    </p>
   </div>
-  <pre class="page-header-meta">$ kubectl get pods -A
-NAMESPACE      NAME                READY   AGE
-argocd         argocd-server       1/1     <b>142d</b>
-kube-system    cilium-agent-x4n2   1/1     <b>208d</b>
-longhorn       longhorn-manager    1/1     <b>208d</b>
-cnpg-system    cnpg-controller     1/1      <b>91d</b>
-vault          vault-0             1/1     <b>186d</b>
-authentik      authentik-server    2/2      <b>54d</b>
-victoria       vmagent-0           1/1      <b>67d</b>
-...            ...                 ...     ...</pre>
+  <pre class="term"><span class="lbl">$ kubectl get pods -A</span><div class="row"><span><span class="key">argocd-server</span></span><span class="val ok">142d</span></div><div class="row"><span><span class="key">cilium-agent</span></span><span class="val ok">208d</span></div><div class="row"><span><span class="key">longhorn-mgr</span></span><span class="val ok">208d</span></div><div class="row"><span><span class="key">cnpg-controller</span></span><span class="val ok">91d</span></div><div class="row"><span><span class="key">vault-0</span></span><span class="val ok">186d</span></div><div class="row"><span><span class="key">authentik</span></span><span class="val warn">54d</span></div><div class="row"><span><span class="key">vmagent</span></span><span class="val ok">67d</span></div><span class="dot3"></span></pre>
 </header>
 
-<div class="tag-filter">
-  <span class="kbd">// filter --tag</span>
+<div class="chips">
+  <span class="lbl">// filter</span>
 {{tagsChipsHtml}}
 </div>
 
-<main class="blog-main">
-{{featuredCardHtml}}
-
-  <div class="post-grid post-grid--all" id="postGrid">
-{{postCardsHtml}}
+<main class="archive">
+{{featuredRowHtml}}
+  <div class="list" id="postList">
+    <div class="list-head">
+      <span>дата</span>
+      <span>категория</span>
+      <span>заголовок</span>
+      <span style="text-align:right;">длина</span>
+      <span></span>
+    </div>
+{{archiveListHtml}}
   </div>
 </main>
 

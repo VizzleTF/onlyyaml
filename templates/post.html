@@ -28,39 +28,39 @@
 <script type="application/ld+json">{{jsonLdBlogPosting}}</script>
 <script type="application/ld+json">{{jsonLdBreadcrumb}}</script>
 </head>
-<body class="post">
+<body class="post" style="--cat: var(--cat-{{catSlug}});">
 
-<div class="bg-layer bg-image"></div>
-<div class="bg-layer bg-tint bg-tint--dim"></div>
-<canvas class="bg-layer bg-rain" id="bgRain" aria-hidden="true"></canvas>
-<div class="bg-layer bg-scanlines"></div>
-<div class="bg-layer bg-noise"></div>
-<div class="bg-layer bg-vignette"></div>
+<div class="bg tint"></div>
+<div class="bg scan"></div>
+<div class="bg noise"></div>
+<div class="bg vignette"></div>
 
 {{nav}}
 
-<div class="chrome tl"><div>post · talos / cilium / cnpg</div></div>
+<div class="read-progress" aria-hidden="true"><div class="bar" id="readBar"></div></div>
+
+<div class="corner tl">post · <b>{{slug}}</b></div>
 
 <nav class="crumbs" aria-label="breadcrumbs">
-  <span class="prompt">$</span> cd
   <a href="/blog/">/blog</a>
   <span class="sep">→</span>
-  <a href="/blog/">{{category}}</a>
+  <a href="/blog/" class="cat">{{categoryLabel}}</a>
   <span class="sep">→</span>
-  {{slug}}
+  <span class="now">{{slug}}</span>
 </nav>
 
 <header class="post-hero">
-  <div class="post-tag">// {{category}}</div>
+  <div class="cat-tag">{{categoryLabel}}</div>
   <h1>{{title}}</h1>
-  <div class="post-hero-meta">
+  <p class="post-deck">{{deck}}</p>
+  <div class="post-meta">
     <span>by <b>vaka</b></span>
-    <span class="dot">·</span>
+    <span class="sep">·</span>
     <span>{{dateHuman}}</span>
-    <span class="dot">·</span>
-    <span>~<b>{{readingMinutes}}</b> min read</span>
-    <span class="dot">·</span>
-    <span><b>{{wordCount}}</b> слов</span>
+    <span class="sep">·</span>
+    <span>~<b>{{readingMinutes}}</b> MIN READ</span>
+    <span class="sep">·</span>
+    <span><b>{{wordCount}}</b> WORDS</span>
     {{updatedBadge}}
   </div>
 </header>

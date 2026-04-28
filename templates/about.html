@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
 {{headCommon}}
-<title>Обо мне // onlyyaml</title>
-<meta name="description" content="Иван K — DevOps-инженер с фокусом на Kubernetes, Terraform, Proxmox и автоматизации инфраструктуры.">
+<title>whoami // onlyyaml</title>
+<meta name="description" content="Иван — DevOps-инженер. Kubernetes, Terraform, Proxmox, selfhost. Делюсь опытом из живых проектов.">
 <link rel="canonical" href="https://onlyyaml.dev/about.html">
 <meta property="og:type" content="profile">
-<meta property="og:title" content="Обо мне // onlyyaml">
-<meta property="og:description" content="Иван K — DevOps-инженер. Kubernetes, Terraform, Proxmox, selfhost.">
+<meta property="og:title" content="whoami // onlyyaml">
+<meta property="og:description" content="Иван — DevOps-инженер. Kubernetes, Terraform, Proxmox, selfhost.">
 <meta property="og:url" content="https://onlyyaml.dev/about.html">
 <meta property="og:image" content="https://onlyyaml.dev/open-graph.png">
 <meta property="og:locale" content="ru_RU">
@@ -22,66 +22,67 @@
 "knowsAbout":["Kubernetes","Terraform","Proxmox","ArgoCD","CI/CD","DevOps","HashiCorp Vault","Prometheus","Grafana"]
 }</script>
 </head>
-<body>
+<body class="about" style="--cat: var(--cat-go);">
 
-<div class="bg-layer bg-image"></div>
-<div class="bg-layer bg-tint bg-tint--dim"></div>
-<canvas class="bg-layer bg-rain" id="bgRain" aria-hidden="true"></canvas>
-<div class="bg-layer bg-scanlines"></div>
-<div class="bg-layer bg-noise"></div>
-<div class="bg-layer bg-vignette"></div>
+<div class="bg tint"></div>
+<div class="bg scan"></div>
+<div class="bg noise"></div>
+<div class="bg vignette"></div>
 
 {{nav}}
 
-<div class="chrome tl"><div>whoami · ivan-k</div></div>
+<div class="corner tl">whoami · <b>ivan-k</b></div>
 
-<header class="page-header">
+<header class="page-head">
   <div>
-    <div class="eyebrow">whoami // kubectl describe me</div>
-    <h1 class="page-title glitch">
-      <span class="line-1" data-text="$ WHOAMI">$ WHOAMI</span>
-      <span class="line-2" data-text="// IVAN K">// IVAN K</span>
+    <div class="eyebrow">// whoami</div>
+    <h1>
+      WHOAMI.
+      <i>// <span style="color:var(--accent-2);">DEVOPS ENGINEER</span></i>
     </h1>
-    <p class="page-header-sub">
-      DevOps-инженер. Kubernetes, Terraform, Proxmox, selfhost. Делюсь опытом из живых проектов, а не теорией из учебников.
-    </p>
   </div>
-  <pre class="page-header-meta">$ kubectl describe me
-Name:         ivan-k
-Role:         <b>devops-engineer</b>
-Focus:        <b>kubernetes · iac · gitops</b>
-Homelab:      <b>proxmox + talos + longhorn</b>
-Since:        <b>2к13</b>
-Status:       <b>online</b></pre>
+  <pre class="term"><span class="lbl">$ kubectl get me -o yaml</span><div class="row"><span class="key">name</span><span class="val">ivan-k</span></div><div class="row"><span class="key">role</span><span class="val">devops</span></div><div class="row"><span class="key">focus</span><span class="val">k8s · iac · gitops</span></div><div class="row"><span class="key">homelab</span><span class="val">proxmox · talos · longhorn</span></div><div class="row"><span class="key">since</span><span class="val">2k13</span></div><div class="row"><span class="key">status</span><span class="val ok"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 6px var(--good);margin-right:6px;vertical-align:1px;"></span>online</span></div><span class="dot3"></span></pre>
 </header>
 
-<main class="post-body about-body">
-  <p>Привет, меня зовут <strong>Иван</strong> — DevOps-инженер с фокусом на автоматизации инфраструктуры, Kubernetes и облачных технологиях.</p>
-  <p>Этот блог — место, где я делюсь реальным опытом: не теорией из учебников, а практическими решениями из живых проектов.</p>
+<div class="about-grid">
+  <article class="post-body">
+    <p>Привет, меня зовут <strong>Иван</strong>. DevOps-инженер с фокусом на автоматизации инфраструктуры, Kubernetes и облачных технологиях. Этот блог — место, где я делюсь реальным опытом: не теорией из учебников, а практическими решениями из живых проектов.</p>
 
-  <h2>Чем я занимаюсь</h2>
-  <ul>
-    <li><strong>Kubernetes &amp; Container Orchestration</strong> — проектирование и поддержка production-кластеров</li>
-    <li><strong>Infrastructure as Code</strong> — Terraform, Proxmox BPG провайдер, модульная архитектура</li>
-    <li><strong>CI/CD &amp; GitOps</strong> — ArgoCD, GitHub Actions, автоматизация деплоя</li>
-    <li><strong>Selfhosted</strong> — домашняя лаборатория на базе Proxmox, Talos Linux, Longhorn</li>
-    <li><strong>Мониторинг</strong> — Prometheus, Grafana, Alertmanager</li>
-    <li><strong>Секреты и безопасность</strong> — HashiCorp Vault, External Secrets Operator</li>
-  </ul>
+    <h2>Чем занимаюсь</h2>
+    <ul>
+      <li><strong>Kubernetes &amp; Container Orchestration</strong> — проектирование и поддержка production-кластеров</li>
+      <li><strong>Infrastructure as Code</strong> — Terraform, Proxmox BPG-провайдер, модульная архитектура</li>
+      <li><strong>CI/CD &amp; GitOps</strong> — ArgoCD, GitHub Actions, автоматизация деплоя</li>
+      <li><strong>Selfhosted</strong> — домашняя лаба на Proxmox, Talos Linux, Longhorn</li>
+      <li><strong>Мониторинг</strong> — Prometheus, Grafana, Alertmanager</li>
+      <li><strong>Секреты и безопасность</strong> — HashiCorp Vault, External Secrets Operator</li>
+    </ul>
 
-  <h2>Проекты</h2>
-  <ul>
-    <li>🔧 <strong><a href="https://marketplace.visualstudio.com/items?itemName=VizzleTF.geminicommit" target="_blank" rel="noopener">CommitSage</a></strong> — VSCode-расширение для автоматической генерации commit-сообщений с помощью Gemini AI</li>
-    <li>🏠 <strong><a href="https://github.com/VizzleTF/home_proxmox" target="_blank" rel="me noopener">Home Proxmox</a></strong> — Terraform-конфигурация для домашней лабы на Proxmox</li>
-  </ul>
+    <h2>Проекты</h2>
+    <ul>
+      <li><strong><a href="https://marketplace.visualstudio.com/items?itemName=VizzleTF.geminicommit" target="_blank" rel="noopener">CommitSage</a></strong> — VSCode-расширение для автогенерации commit-сообщений через Gemini AI</li>
+      <li><strong><a href="https://github.com/VizzleTF/home_proxmox" target="_blank" rel="me noopener">Home Proxmox</a></strong> — Terraform-конфигурация для домашней лабы на Proxmox</li>
+    </ul>
 
-  <h2>Контакты</h2>
-  <ul>
-    <li>📱 Telegram: <a href="https://t.me/onlyyaml" target="_blank" rel="noopener">@onlyyaml</a></li>
-    <li>💻 GitHub: <a href="https://github.com/VizzleTF" target="_blank" rel="me noopener">github.com/VizzleTF</a></li>
-    <li>📧 Email: <a href="mailto:vizzletf@gmail.com">vizzletf@gmail.com</a></li>
-  </ul>
-</main>
+    <h2>Контакты</h2>
+    <ul>
+      <li>Telegram — <a href="https://t.me/onlyyaml" target="_blank" rel="noopener">@onlyyaml</a></li>
+      <li>GitHub — <a href="https://github.com/VizzleTF" target="_blank" rel="me noopener">github.com/VizzleTF</a></li>
+      <li>Email — <a href="mailto:vizzletf@gmail.com">vizzletf@gmail.com</a></li>
+    </ul>
+  </article>
+
+  <aside class="toc" aria-label="оглавление">
+    <div class="head">// stack</div>
+    <ol>
+      <li><a><span class="n">k8s</span><span>kubernetes · talos</span></a></li>
+      <li><a><span class="n">iac</span><span>terraform · proxmox</span></a></li>
+      <li><a><span class="n">gops</span><span>argocd · gitops</span></a></li>
+      <li><a><span class="n">obs</span><span>prometheus · grafana</span></a></li>
+      <li><a><span class="n">sec</span><span>vault · eso</span></a></li>
+    </ol>
+  </aside>
+</div>
 
 {{footer}}
 
