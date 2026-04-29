@@ -110,7 +110,18 @@ export CONTROL_PLANE_IP=192.168.1.101
 cd ~
 talosctl gen config talos-proxmox-cluster https://$CONTROL_PLANE_IP:6443 --output-dir _out
 ```
-Должно получиться:![Сгенерированные конфигурационные файлы Talos в директории _out](/blog/terraform-proxmox-talos/Pasted%20image%2020250920191633.png)
+Должно получиться:
+```bash
+$ ls -lah _out
+total 56
+drwx------@  3 ivan staff   96B Sep 20 18:33 _out
+drwxr-xr-x@  7 ivan staff  224B Sep 20 18:33 .
+drwxr-x---+ 72 ivan staff  2.3K Sep 20 19:16 ..
+drwx------@  3 ivan staff   96B Sep 20 18:23 ~
+-rw-r--r--@  1 ivan staff   14K Sep 20 18:20 controlplane.yaml
+-rw-r--r--@  1 ivan staff  1.6K Sep 20 18:32 talosconfig
+-rw-r--r--@  1 ivan staff  5.4K Sep 20 17:59 worker.yaml
+```
 
 Можно поправить конфиги по желанию, можно оставить дефолт. В рамках первого кластера лучше оставить конфиги дефолтными и без понимания ничего не менять.
 
@@ -274,7 +285,13 @@ talosctl kubeconfig talos.kube.conf
 export KUBECONFIG=~/talos.kube.conf
 kubectl get nodes
 ```
-![Вывод kubectl get nodes — ноды Kubernetes кластера на Talos в статусе Ready](/blog/terraform-proxmox-talos/Pasted%20image%2020250920192949.png)
+```bash
+$ kubectl get nodes
+NAME            STATUS   ROLES           AGE   VERSION
+talos-diw-bx5   Ready    control-plane   55m   v1.34.0
+talos-g3x-ynn   Ready    control-plane   55m   v1.34.0
+talos-vjz-uig   Ready    control-plane   55m   v1.34.0
+```
 
 Точно также можно добавлять и воркеров в наши ноды, только указывая `user_data_file_id: "memini:snippets/talos-worker.yaml"`
 
