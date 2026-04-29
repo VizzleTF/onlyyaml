@@ -20,7 +20,7 @@
 "author":{"@type":"Person","name":"Ivan K"}
 }</script>
 </head>
-<body class="home">
+<body>
 
 <div class="bg tint"></div>
 <div class="bg scan"></div>
@@ -32,7 +32,7 @@
 <div class="corner tl">node · <b>talos-03</b> / proxmox-ve</div>
 <div class="corner bl">
   <span>build · <b>2k26.04</b></span>
-  <span>uptime · <b>208d 14h</b></span>
+  <span>uptime · <b>{{clusterUptime}}</b></span>
 </div>
 <div class="corner br">
   <span>// <b>scroll</b> ↓</span>
@@ -70,7 +70,7 @@
       <div class="row"><span class="key">cpu</span><span class="val warn">62%</span></div>
       <div class="row"><span class="key">mem</span><span class="val">48%</span></div>
       <div class="row"><span class="key">argocd</span><span class="val ok"><span class="blink"></span>synced</span></div>
-      <div class="row"><span class="key">uptime</span><span class="val">208d</span></div>
+      <div class="row"><span class="key">uptime</span><span class="val">{{clusterUptimeShort}}</span></div>
     </aside>
   </div>
 </section>

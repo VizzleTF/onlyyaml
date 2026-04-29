@@ -30,6 +30,40 @@ const DEFAULT_OG = `${SITE_URL}/open-graph.png`;
 const CATEGORIES = ["kubernetes", "gitops", "storage", "networking", "observability", "security", "misc"];
 const MONTHS_RU = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
 
+// Cluster bootstrap + per-component «kubectl get pods» epochs.
+// Все uptime-цифры в шаблонах считаются от этих дат, чтобы не хардкодить «208d».
+const CLUSTER_EPOCH = new Date("2025-10-03T10:00:00Z");
+const POD_AGES = [
+  { name: "argocd-server",   epoch: new Date("2025-12-08T00:00:00Z"), status: "ok"   },
+  { name: "cilium-agent",    epoch: new Date("2025-10-03T00:00:00Z"), status: "ok"   },
+  { name: "longhorn-mgr",    epoch: new Date("2025-10-03T00:00:00Z"), status: "ok"   },
+  { name: "cnpg-controller", epoch: new Date("2026-01-28T00:00:00Z"), status: "ok"   },
+  { name: "vault-0",         epoch: new Date("2025-10-25T00:00:00Z"), status: "ok"   },
+  { name: "authentik",       epoch: new Date("2026-03-06T00:00:00Z"), status: "warn" },
+  { name: "vmagent",         epoch: new Date("2026-02-21T00:00:00Z"), status: "ok"   },
+];
+const ARGOCD_NAME = "argocd-server";
+
+function daysSince(epoch, now) {
+  return Math.max(0, Math.floor((now - epoch) / 86_400_000));
+}
+function clusterUptime(now) {
+  const ms = Math.max(0, now - CLUSTER_EPOCH);
+  const days = Math.floor(ms / 86_400_000);
+  const hours = Math.floor((ms % 86_400_000) / 3_600_000);
+  return { full: `${days}d ${hours}h`, short: `${days}d` };
+}
+function podsTermInnerHtml(now) {
+  const rows = POD_AGES.map(({ name, epoch, status }) =>
+    `<div class="row"><span><span class="key">${name}</span></span><span class="val ${status}">${daysSince(epoch, now)}d</span></div>`
+  ).join("");
+  return `<span class="lbl">$ kubectl get pods -A</span>${rows}`;
+}
+function argocdDays(now) {
+  const pod = POD_AGES.find(p => p.name === ARGOCD_NAME);
+  return daysSince(pod.epoch, now);
+}
+
 // Tags shown as the visible category label in cards/list — first match wins.
 const PRIMARY_TECH_TAGS = ["terraform", "talos", "kubernetes", "longhorn", "argocd", "cilium", "vault", "cnpg", "proxmox"];
 
@@ -339,7 +373,13 @@ ${lis}
   </aside>`;
 }
 
-async function buildPostPages(posts, md, templates, partials) {
+function navFor(navHtml, page, dynamics) {
+  return navHtml
+    .replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === page ? "active" : "")
+    .replace(/\{\{argocdDays\}\}/g, String(dynamics.argocdDays));
+}
+
+async function buildPostPages(posts, md, templates, partials, dynamics) {
   for (const post of posts) {
     const bodyHtml = injectTermChrome(md.render(post.body));
     const canonicalUrl = `${SITE_URL}/blog/${post.slug}/`;
@@ -348,7 +388,7 @@ async function buildPostPages(posts, md, templates, partials) {
     const dateUpper = `${post.date.getDate().toString().padStart(2,"0")} ${MONTHS_RU[post.date.getMonth()].toUpperCase()} ${post.date.getFullYear()}`;
     const vars = {
       headCommon: partials.head,
-      nav: partials.nav.replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === "Blog" ? "active" : ""),
+      nav: navFor(partials.nav, "Blog", dynamics),
       footer: partials.footer,
       title: escapeHtml(post.title),
       seoTitle: escapeHtml(post.seoTitle),
@@ -385,7 +425,7 @@ async function buildPostPages(posts, md, templates, partials) {
   }
 }
 
-async function buildBlogIndex(posts, templates, partials) {
+async function buildBlogIndex(posts, templates, partials, dynamics) {
   // Авто-featured: если в frontmatter ни один пост не помечен `featured: true`,
   // показываем самый свежий — пустая шапка архива выглядит криво.
   const featured = posts.find(p => p.featured) || posts[0] || null;
@@ -417,37 +457,40 @@ async function buildBlogIndex(posts, templates, partials) {
 
   const vars = {
     headCommon: partials.head,
-    nav: partials.nav.replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === "Blog" ? "active" : ""),
+    nav: navFor(partials.nav, "Blog", dynamics),
     footer: partials.footer,
     postCount: String(posts.length),
     tagsChipsHtml: chips,
     featuredRowHtml: featuredRowHtml(featured, 1),
     archiveListHtml: rest.map(p => listRowHtml(p)).join("\n"),
+    podsTermHtml: dynamics.podsTermHtml,
   };
   const html = render(templates.blog, vars);
   await mkdir(join(DIST, "blog"), { recursive: true });
   await writeFile(join(DIST, "blog", "index.html"), html);
 }
 
-async function buildAbout(templates, partials) {
+async function buildAbout(templates, partials, dynamics) {
   const vars = {
     headCommon: partials.head,
-    nav: partials.nav.replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === "About" ? "active" : ""),
+    nav: navFor(partials.nav, "About", dynamics),
     footer: partials.footer,
   };
   const html = render(templates.about, vars);
   await writeFile(join(DIST, "about.html"), html);
 }
 
-async function buildHome(posts, draftCount, templates, partials) {
+async function buildHome(posts, draftCount, templates, partials, dynamics) {
   const latest = posts.slice(0, 3);
   const vars = {
     headCommon: partials.head,
-    nav: partials.nav.replace(/\{\{nav(Home|Blog|About)Active\}\}/g, (_m, k) => k === "Home" ? "active" : ""),
+    nav: navFor(partials.nav, "Home", dynamics),
     footer: partials.footer,
     publishedCount: String(posts.length),
     draftCount: String(draftCount),
     latestThreeHtml: latest.map(p => cardHtml(p)).join("\n"),
+    clusterUptime: dynamics.clusterUptime,
+    clusterUptimeShort: dynamics.clusterUptimeShort,
   };
   const html = render(templates.index, vars);
   await writeFile(join(DIST, "index.html"), html);
@@ -505,6 +548,40 @@ ${body}
   await writeFile(join(DIST, "sitemap.xml"), sm);
 }
 
+function stripMd(md) {
+  // Чистим markdown до плоского текста: код-блоки шумят и раздувают индекс,
+  // ссылки/картинки сворачиваются до alt/anchor.
+  return String(md)
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`\n]+`/g, " ")
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*>\s?/gm, "")
+    .replace(/[*_~]+/g, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function buildSearchIndex(posts) {
+  // Минимальный индекс для cmd-k. body — очищенный от markdown plain-text для full-text.
+  const items = posts.map(p => {
+    const label = displayCategory(p);
+    return {
+      slug: p.slug,
+      title: p.title,
+      summary: p.summary || "",
+      tags: p.tags,
+      catLabel: label,
+      catSlug: catSlug(label),
+      date: isoDate(p.date),
+      body: stripMd(p.body),
+    };
+  });
+  await writeFile(join(DIST, "posts.json"), JSON.stringify(items));
+}
+
 async function buildRedirects() {
   // Никаких 30x: rewrite-правила (200) подавляют trailing-slash нормализацию Cloudflare Pages.
   // /blog, /blog.html и /blog/<slug> отдают тот же index.html, что и канонические /blog/, /blog/<slug>/.
@@ -546,14 +623,24 @@ async function build() {
   const { posts, draftCount } = await loadPosts();
   if (!posts.length) console.warn("! no posts found in posts/");
 
-  await buildPostPages(posts, md, templates, partials);
-  await buildBlogIndex(posts, templates, partials);
-  await buildHome(posts, draftCount, templates, partials);
-  await buildAbout(templates, partials);
+  const now = new Date();
+  const uptime = clusterUptime(now);
+  const dynamics = {
+    clusterUptime: uptime.full,
+    clusterUptimeShort: uptime.short,
+    argocdDays: argocdDays(now),
+    podsTermHtml: podsTermInnerHtml(now),
+  };
+
+  await buildPostPages(posts, md, templates, partials, dynamics);
+  await buildBlogIndex(posts, templates, partials, dynamics);
+  await buildHome(posts, draftCount, templates, partials, dynamics);
+  await buildAbout(templates, partials, dynamics);
   await buildRss(posts);
   await buildSitemap(posts);
   await buildRobots();
   await buildRedirects();
+  await buildSearchIndex(posts);
 
   const ms = Date.now() - t0;
   console.log(`✓ built ${posts.length} posts → ${DIST} in ${ms}ms`);

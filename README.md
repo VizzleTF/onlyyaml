@@ -17,8 +17,8 @@
 posts/       # Markdown-посты с фронт-маттером
 templates/   # HTML-шаблоны страниц (index, blog, post, about)
 partials/    # head, nav, footer
-public/      # статика (картинки, видео, CSS, JS) → копируется as-is в dist/
-scripts/     # build.mjs + миграция
+public/      # статика (картинки, CSS, JS) → копируется as-is в dist/
+scripts/     # build.mjs
 dist/        # результат сборки (игнорится)
 ```
 

@@ -7,7 +7,6 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node scripts/build.mjs --watch",
-    "migrate": "node scripts/migrate-from-astro.mjs",
     "serve": "npx serve dist -l 3000"
   },
   "dependencies": {
