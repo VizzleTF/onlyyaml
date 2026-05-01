@@ -142,7 +142,11 @@ data "talos_image_factory_urls" "this" {
 }
 
 output "disk_image_url" {
-  value = data.talos_image_factory_urls.this.urls.disk_image
+  value = replace(
+    data.talos_image_factory_urls.this.urls.disk_image,
+    ".raw.xz",
+    ".qcow2",
+  )
 }
 ```
 
@@ -151,7 +155,7 @@ output "disk_image_url" {
 `talos_image_factory_urls` отдаёт нам две вещи:
 
 - `urls.installer` - ссылка на installer-образ, пойдёт в `machine.install.image` в конфиге Talos и останется внутри модуля.
-- `urls.disk_image` - ссылка на qcow2 для Proxmox. Этот URL нужен в корне проекта - в модуле `cloud_images`. Пробрасываем его наружу через `output`.
+- `urls.disk_image` - ссылка на disk-образ для платформы. Тут есть нюанс: для `nocloud` data source отдаёт `.raw.xz`, а Proxmox-импорту удобнее qcow2. Аргумента выбора формата у data source нет, но factory по той же схеме URL раздаёт и qcow2 - отличие ровно в расширении. Поэтому через `replace(..., ".raw.xz", ".qcow2")` получаем qcow2-URL, не дублируя ни домен, ни путь, ни архитектуру: единственный источник правды остаётся в data source. Пробрасываем результат наружу через `output` - дальше он понадобится в корне проекта в модуле `cloud_images`.
 
 Создаём файл `modules/talos/variables.tf` с переменными модуля:
 
