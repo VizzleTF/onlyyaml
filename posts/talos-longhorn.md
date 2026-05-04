@@ -375,7 +375,7 @@ machine:
   network:
     interfaces:
       - interface: eth0
-        dhcp: true
+        dhcp: false
         vip:
           ip: 192.168.1.100
 cluster:
