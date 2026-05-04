@@ -380,7 +380,26 @@ machine:
           ip: 192.168.1.100
 cluster:
   allowSchedulingOnControlPlanes: true
+  apiServer:
+    admissionControl:
+      - name: PodSecurity
+        configuration:
+          apiVersion: pod-security.admission.config.k8s.io/v1
+          kind: PodSecurityConfiguration
+          defaults:
+            enforce: privileged
+            audit: restricted
+            warn: restricted
 ```
+
+Блок `cluster.apiServer.admissionControl` настраивает Pod Security Admission. Talos из коробки ставит `enforce: baseline` — это достаточно строго, чтобы Longhorn (и многие другие чарты с hostPath, mount propagation, hostPID) admission-ом сразу резались. Чтобы хоумлаб не превращался в борьбу с лейблами на каждый namespace, переопределяем admission на уровне всего кластера:
+
+- **`enforce: privileged`** - ничего не блокируется, любой privileged-под создаётся без вопросов.
+- **`warn: restricted`** и **`audit: restricted`** - apiserver всё равно проверяет каждый под по самому строгому уровню `restricted` и при нарушении пишет warning (`Warning: would violate PodSecurity "restricted:latest"`) в ответ `kubectl`-у плюс запись в audit log. Под не падает, но видно, кто нарушает security baseline. Для хоумлаба - приятный бесплатный фидбек.
+
+`exemptions` намеренно не указываем: Talos уже дефолтно ставит `namespaces: [kube-system]`, и если перечислить его повторно, strategic merge склеит два списка в один с дубликатом - kube-apiserver упадёт с `exemptions.namespaces[1]: Duplicate value`.
+
+Для прода такой подход не подходит - там привычнее держать `enforce: baseline` или `restricted` и точечно делать exemption на namespace типа `longhorn-system`. Но для хоумлаба «всё работает + warning-и видны» - оптимальный компромисс.
 
 Кроме VIP в этом же патче включаем `allowSchedulingOnControlPlanes: true`. Флаг снимает дефолтный taint `node-role.kubernetes.io/control-plane:NoSchedule` - и обычные workload-поды начинают ехать на CP-ноды. Без этого кластер из 3 CP без воркеров был бы пустым: etcd-у место есть, а приложениям - нет.
 
