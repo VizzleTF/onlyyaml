@@ -404,9 +404,7 @@ cluster:
 | `enforce: privileged` | ничего не блокируется - privileged-поды стартуют без лейблов на namespace |
 | `warn: restricted` / `audit: restricted` | apiserver всё равно проверяет под на `restricted` и при нарушении пишет warning + audit log |
 
-`exemptions` не указываем: Talos уже дефолтно даёт `namespaces: [kube-system]`, и повторное перечисление через strategic merge даст дубликат - kube-apiserver упадёт с `exemptions.namespaces[1]: Duplicate value`.
-
-Для прода такая раздача `privileged` всему кластеру не катит - там привычнее `enforce: baseline` плюс точечный exemption на `longhorn-system`. Для хоумлаба «всё работает + warning-и видны» - нормальный компромисс.
+> **Privileged** - компромисс в сторону удобства над безопасностью для хоумлаба. В проде лучше оставить дефолт.
 
 Патч прикладываем только к CP - воркерам VIP не нужен, а `cluster.*` Talos на воркерах и так игнорирует.
 
