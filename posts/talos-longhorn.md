@@ -366,9 +366,9 @@ machine:
 
 > **Официальный гайд Longhorn по Talos** со всеми data-path mount-ами и объяснением, зачем они нужны: [Talos Linux Support](https://longhorn.io/docs/archives/1.7.3/advanced-resources/os-distro-specific/talos-linux-support/#data-path-mounts).
 
-## Патч для control-plane с VIP
+## Патч для control-plane
 
-Раз `cluster_endpoint` - это VIP, надо сказать Talos-у, как его поднимать. VIP в Talos живёт в конфиге сетевого интерфейса control-plane нод. Создаём файл `modules/talos/patches/controlplane.yaml`:
+Control-plane ноды требуют чуть больше настроек, чем воркеры: поднять VIP под `cluster_endpoint`, разрешить schedule workload-ов на CP (3 CP без воркеров иначе пустые), ослабить Pod Security Admission, чтобы Longhorn и прочие privileged-чарты не упирались в admission. Всё это складываем в `modules/talos/patches/controlplane.yaml`:
 
 ```yaml
 machine:
