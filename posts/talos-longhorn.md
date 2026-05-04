@@ -392,18 +392,23 @@ cluster:
             warn: restricted
 ```
 
-Блок `cluster.apiServer.admissionControl` настраивает Pod Security Admission. Talos из коробки ставит `enforce: baseline` — это достаточно строго, чтобы Longhorn (и многие другие чарты с hostPath, mount propagation, hostPID) admission-ом сразу резались. Чтобы хоумлаб не превращался в борьбу с лейблами на каждый namespace, переопределяем admission на уровне всего кластера:
+Что делает каждая строчка:
 
-- **`enforce: privileged`** - ничего не блокируется, любой privileged-под создаётся без вопросов.
-- **`warn: restricted`** и **`audit: restricted`** - apiserver всё равно проверяет каждый под по самому строгому уровню `restricted` и при нарушении пишет warning (`Warning: would violate PodSecurity "restricted:latest"`) в ответ `kubectl`-у плюс запись в audit log. Под не падает, но видно, кто нарушает security baseline. Для хоумлаба - приятный бесплатный фидбек.
+| Строка | Что делает |
+| --- | --- |
+| `interface: eth0` | основной интерфейс ноды |
+| `dhcp: false` | адрес статикой - DHCP не накидывает лишних |
+| `vip.ip` | shared-IP под kube-apiserver, плавает между CP |
+| `allowSchedulingOnControlPlanes: true` | снимает taint `node-role.kubernetes.io/control-plane:NoSchedule` - workload-поды едут на CP |
+| `admissionControl[0].name: PodSecurity` | переопределяем Talos-овский дефолт `enforce: baseline` (на нём Longhorn режется) |
+| `enforce: privileged` | ничего не блокируется - privileged-поды стартуют без лейблов на namespace |
+| `warn: restricted` / `audit: restricted` | apiserver всё равно проверяет под на `restricted` и при нарушении пишет warning + audit log |
 
-`exemptions` намеренно не указываем: Talos уже дефолтно ставит `namespaces: [kube-system]`, и если перечислить его повторно, strategic merge склеит два списка в один с дубликатом - kube-apiserver упадёт с `exemptions.namespaces[1]: Duplicate value`.
+`exemptions` не указываем: Talos уже дефолтно даёт `namespaces: [kube-system]`, и повторное перечисление через strategic merge даст дубликат - kube-apiserver упадёт с `exemptions.namespaces[1]: Duplicate value`.
 
-Для прода такой подход не подходит - там привычнее держать `enforce: baseline` или `restricted` и точечно делать exemption на namespace типа `longhorn-system`. Но для хоумлаба «всё работает + warning-и видны» - оптимальный компромисс.
+Для прода такая раздача `privileged` всему кластеру не катит - там привычнее `enforce: baseline` плюс точечный exemption на `longhorn-system`. Для хоумлаба «всё работает + warning-и видны» - нормальный компромисс.
 
-Кроме VIP в этом же патче включаем `allowSchedulingOnControlPlanes: true`. Флаг снимает дефолтный taint `node-role.kubernetes.io/control-plane:NoSchedule` - и обычные workload-поды начинают ехать на CP-ноды. Без этого кластер из 3 CP без воркеров был бы пустым: etcd-у место есть, а приложениям - нет.
-
-Патч прикладываем только к CP - воркерам VIP не нужен и не должен объявляться (а `cluster.*` настройки и так читаются только из controlplane machine config).
+Патч прикладываем только к CP - воркерам VIP не нужен, а `cluster.*` Talos на воркерах и так игнорирует.
 
 > **IP-адрес** в yaml-е захардкожен под пример статьи. Подставьте свой VIP из той же подсети, что и ноды, и этот же адрес укажите в `cluster_endpoint`.
 
